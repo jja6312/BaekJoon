@@ -26,10 +26,13 @@ public class Main{
         		map.put(intArr2[i], countIndex++);
         	}
         }
-        for(int i=0; i<N;i++) {
-        	bw.write(map.get(intArr[i])+" ");
-        }
         
+        StringBuilder sb = new StringBuilder();
+        
+        for(int i=0; i<N;i++) {
+        	sb.append(map.get(intArr[i])).append(' ');
+        } 
+        bw.write(sb.toString());
         bw.flush();
         bw.close();
         br.close();
