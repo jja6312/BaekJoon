@@ -21,7 +21,7 @@ public class Main {
     while (i < len) {
         // <와 > 사이의 문자는 그대로 출력
         if(input.charAt(i) == '<') {
-            while(i < len && input.charAt(i) != '>') {
+            while(input.charAt(i) != '>') {
                 bw.write(input.charAt(i++));
             }
             if (i < len) {
@@ -41,9 +41,9 @@ public class Main {
 
             if(i < len && input.charAt(i) == ' ') {
                 bw.write(input.charAt(i++));
-            }
-        }
-    }
+            }//if
+        }//else
+    }//while
 }
 
 }
