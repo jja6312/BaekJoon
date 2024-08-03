@@ -1,37 +1,27 @@
-import java.util.*;
-import java.io.*;
 
-public class Main{
+import java.io.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static LinkedList<Integer> linkedList = new LinkedList<Integer>();
 
-    public static void main(String[]args) throws IOException{
-    	read();
-        loop();
-        bw.write(""+linkedList.get(0));
+    public static void main(String[] args) throws IOException {
+        int n = Integer.parseInt(br.readLine());
+        Deque<Integer> deque = new ArrayDeque<>();
+        for(int i=1; i<=n; i++){
+            deque.offerLast(i);
+        }
+
+        while(deque.size()>1){
+            deque.pollFirst();
+            deque.offerLast(deque.pollFirst());
+        }
+
+        bw.write(deque.peek()+"");
         bw.flush();
         bw.close();
         br.close();
-
-        
-    }//main()
-    
-    public static void read() throws IOException{
-        int N = Integer.parseInt(br.readLine());
-        for(int i=1; i<=N; i++){
-            linkedList.add(i);
-        }
     }
-    
-    public static void loop(){
-        while(true){
-            if(linkedList.size()==1) break;
-            linkedList.removeFirst();
-            int saveInt = linkedList.getFirst();
-            linkedList.removeFirst();
-            linkedList.add(saveInt);
-        }
-    }
-    
-}//Main
+}
