@@ -1,22 +1,24 @@
-import java.util.*;
+
+
 import java.io.*;
 
-public class Main{
-    public static void main(String [] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        int N = Integer.parseInt(br.readLine());
-        String S = br.readLine();
-        int sum=0;
-        for(int i=0; i<N; i++){
-            char s = S.charAt(i);
-            int sInt = Character.getNumericValue(s);
-            sum += sInt;
+public class Main {
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+    public static void main(String[] args) throws IOException {
+        int n = Integer.parseInt(br.readLine());
+        String A = br.readLine();
+        int sum =0;
+        for(int i=0; i<n; i++){
+            int num = A.charAt(i)-'0';
+            sum += num;
         }
-        
-        bw.write(""+sum);
+
+        bw.write(sum+"\n");
         bw.flush();
         bw.close();
         br.close();
+
     }
 }
