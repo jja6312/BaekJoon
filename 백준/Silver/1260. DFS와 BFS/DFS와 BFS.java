@@ -1,87 +1,118 @@
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import java.io.*;
 import java.util.*;
+
+// ==================== 문제 접근 ====================
+// CustomClass인 Edge[] 로 전체 그래프를 관리하고,
+// Edge클래스는
+// PriorityQueue<Integer> 를 통해 목적지 노드가 작은 것부터 뽑아낼 수 있게 관리한다.
+
 
 
 public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static List<Integer>[] arr;
-    static boolean [] visited;
+    static Edge[] edgeList;
+    static Edge[] edgeListForBfs;//복제 엣지리스트생성(bfs용. 왜냐하면 dfs수행시 기존 edgeList의 pq가 poll돼서 데이터가 변경됨.)
+    static boolean[] visited;
 
+    // 다음 도착노드를 저장하는 클래스
+    static class Edge{
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
 
-
+        public void addNode(int node){
+            pq.offer(node);// 다음 노드는 오름차순으로 정렬된다.
+        }
+    }
 
     public static void main(String[] args) throws IOException {
-        StringTokenizer st = new StringTokenizer(br.readLine()," ");
+        StringTokenizer st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
         int v = Integer.parseInt(st.nextToken());
 
-        arr = new ArrayList[n+1];
+        // 1. 출발지 노드번호에 접근할 수 있는 리스트
+        edgeList = new Edge[n+1];
+        edgeListForBfs = new Edge[n+1];
         visited = new boolean[n+1];
 
-        for(int i=0; i<arr.length; i++){
-            arr[i] = new ArrayList<>();
+        // 2. 리스트 초기화
+        for(int i=1; i<=n; i++){
+            edgeList[i] = new Edge();
+            edgeListForBfs[i] = new Edge();
         }
 
+        // 3. 도착지노드를 넣어준다.
         for(int i=0; i<m; i++){
-            st = new StringTokenizer(br.readLine()," ");
+            st = new StringTokenizer(br.readLine());
             int startNode = Integer.parseInt(st.nextToken());
-            int endNode = Integer.parseInt(st.nextToken());
+            int nextNode = Integer.parseInt(st.nextToken());
 
-            arr[startNode].add(endNode);
-            arr[endNode].add(startNode);
+            //양방향관계
+            edgeList[startNode].addNode(nextNode);
+            edgeList[nextNode].addNode(startNode);
+            edgeListForBfs[startNode].addNode(nextNode);
+            edgeListForBfs[nextNode].addNode(startNode);
         }
 
-        for(int i=0; i<arr.length; i++){
-            Collections.sort(arr[i]);
-        }
 
-        dfs(v);
 
-        //방문배열 초기화
-        for(int i=0; i<visited.length; i++){
-            visited[i] = false;
-        }
-        bw.write("\n");
 
-        bfs(v);
+        StringBuilder sbDfs = dfs(v, new StringBuilder());
+        bw.write(sbDfs.append("\n").toString());
 
+        Arrays.fill(visited,false);//방문배열초기화
+        StringBuilder sbBfs = bfs(v, new StringBuilder());
+        bw.write(sbBfs.toString());
 
         bw.flush();
         bw.close();
         br.close();
 
+
     }
 
-    private static void dfs(int v) throws IOException{
-        if(visited[v]) return;
-        visited[v] = true;
-
-        bw.write(v+" ");
-        for(int x:arr[v]){
-            dfs(x);
-        }
-    }
-
-    public static void bfs(int v) throws IOException{
-
+    private static StringBuilder bfs(int start, StringBuilder sb) {
 
         Queue<Integer> queue = new LinkedList<>();
-        queue.offer(v);
+        queue.offer(start); //현재 위치를 넣는다.
+        visited[start] = true;
 
         while(!queue.isEmpty()){
-            int currentNum = queue.poll();
+            int currentNode = queue.poll();
 
-            if(visited[currentNum]) continue;
-            bw.write(currentNum+" ");
-            visited[currentNum] = true;
+            sb.append(currentNode).append(" ");
 
-            for(int x:arr[currentNum]){
-                queue.offer(x);
+            //다음 위치 방문
+            PriorityQueue<Integer> nextNodePq = edgeListForBfs[currentNode].pq;
+            while(!nextNodePq.isEmpty()){
+                int nextNode = nextNodePq.poll();
+
+                if(!visited[nextNode]){//방문하지않았다면 큐에 저장
+                    queue.offer(nextNode);
+                    //다음위치 방문 처리
+                    visited[nextNode] = true;
+                }
+            }//while - pq
+        }//while - queue
+
+        return sb;
+    }//bfs
+
+    private static StringBuilder dfs(int start, StringBuilder sb) {
+        visited[start] = true;//현재 위치 방문 처리
+        //방문한 위치를 sb에 담는다.
+        sb.append(start).append(" ");
+
+        //출발지 노드에서 시작해서,
+        //만약 방문하지 않은 곳이라면
+        //다음 노드에 방문한다.
+        PriorityQueue<Integer> nextEdgePq = edgeList[start].pq;
+        while(!nextEdgePq.isEmpty()){
+            int nextEdge = nextEdgePq.poll();
+            if(!visited[nextEdge]){
+                sb = dfs(nextEdge, sb);
             }
-        }//while
-    }
-
-}//Main Class
+        }
+         return sb;
+    }//dfs
+}
