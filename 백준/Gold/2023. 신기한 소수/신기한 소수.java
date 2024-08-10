@@ -1,64 +1,66 @@
-import java.util.*;
+
+
 import java.io.*;
 
-public class Main{
+// ================ 문제 접근 ================
+// n자리의 모든 소수를 체크하는 방식은 옳은가? => n이 최대 8이므로, 10,000,000이고, 소수인지 판별하려면 그 안에서 루트 n만큼 또 for문을 돌리게된다.
+// 따라서 시간복잡도 n * 루트n = 1,000,000,000,000 이므로 모든 소수를 체크하는 방식은 틀렸다.
+
+// (오답)그렇다면, 루트 n까지 소수인지 아닌지 판별하고, dp를 통해 푸는건 어떨까? 풀어보자.
+
+// 아이디어 참고 : https://st-lab.tistory.com/281
+// 1의 자리수부터, 소수인 경우 그 다음 자리수에 숫자를 순회하며 소수인경우를 체크하는 방법이 있구나.
+
+
+public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static int N;
 
-    public static void main(String[]args) throws IOException{
-        read();
-        DFS(2,1);
-        DFS(3,1);
-        DFS(5,1);
-        DFS(7,1);
+    public static void main(String[] args) throws IOException {
+        int n= Integer.parseInt(br.readLine());
+
+        dfs(0,n,new int[n]);
+
+
         bw.flush();
         bw.close();
         br.close();
-        
-    }//main()
+    }
 
-    public static void read() throws IOException{
-        N = Integer.parseInt(br.readLine());
-        /*
-        
-        DFS로 처리.
-        
-        N자리 소수판별
-        0. N이주어지면, 10^N<= XXX <10^N+1 까지의 소수를 판별하는 메서드 필요.
-        1.소수판별하는 메서드필요
-        2. 오름차순으로 정렬해서 모두출력
-        
-        
-        */
-    }//read()
-    
-    public static void DFS(int number, int jarisu)throws IOException{
-        if( jarisu == N ){
-            if(sosu(number)){
-                bw.write(number+"\n");
-            }//if2
+    private static void dfs(int depth, int n, int[] arr) throws IOException {
+        if(depth == n){// 끝에 다다르면 출력
+            for(int i=0; i<n; i++){
+               bw.write(arr[i]+"");
+            }
+            bw.write("\n");
             return;
-        }//if1
-        for(int i=1; i<10; i++){
-            if(i%2 == 0){
-                continue;
-            }//if
-            if(sosu(number*10+i)){
-                DFS(number*10+i, jarisu + 1);
+        }
+
+        for(int i=1; i<=9; i++){
+            int sum = 0;
+
+            //1의자리 이외자리 연산!
+            int ten = (int)Math.pow(10,depth);
+            for(int j=0; j<depth; j++){
+                sum += ten * arr[j];
+                ten /= 10;
+            }
+            sum += i; //1의자리는 i!
+
+            if(isSosu(sum)){//값이 소수라면
+                arr[depth] = i;
+                dfs(depth+1, n,arr);//다음dfs로
             }
         }
-    }//DFS
-    
-    
-    public static boolean sosu(int n){
-        if(n<=1) return false;
-        
-        for(int i=2; i<=(int)Math.sqrt(n); i++){
-            if(n%i==0){
-                return false;
-            }
+
+    }
+
+    private static boolean isSosu(int num) {
+        if(num<2) return false;
+        for(int i=2; i<=Math.sqrt(num); i++){
+            if((num % i) == 0) return false;
         }
         return true;
     }
-}//Main
+
+}
