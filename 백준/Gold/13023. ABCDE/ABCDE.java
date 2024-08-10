@@ -1,63 +1,85 @@
-import java.util.*;
-import java.io.*;
 
-public class Main{
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+// ================= 문제 접근 =================
+// 1. 인접리스트로 친구 관계를 양방향 설정
+// 2. dfs로 모든 요소를 순회하며, depth가 4일때까지 갈 수 있다면 "1"출력
+
+//엥 틀렸네?
+//=>실수로 첫방문 초기화X
+public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-    static boolean visited[];
-    static ArrayList<Integer>[] A;
-    static boolean arrive;
-    
+    static boolean findAnswer = false;
+    static StringBuilder sb = new StringBuilder();
+    static int n;
+    static int m;
+    static List<Integer>[] listArr;
 
-    public static void main(String[]args) throws IOException{
-        read();
+
+
+    public static void main(String[] args) throws IOException {
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+        listArr = new ArrayList[n];
+
+        // 인접리스트 생성
+        for(int i=0; i<n; i++){
+            listArr[i] = new ArrayList<>();
+        }
+
+        // 인접리스트 초기화
+        for(int i=0; i<m; i++){
+            st= new StringTokenizer(br.readLine());
+            int start = Integer.parseInt(st.nextToken());
+            int end = Integer.parseInt(st.nextToken());
+            //양방향 관계 설정
+            listArr[start].add(end);
+            listArr[end].add(start);
+        }
+
+        //모든 친구리스트를 dfs로 순회
+        for(int i=0; i<n; i++){
+            if(findAnswer) break;
+            boolean[] visited = new boolean[n];
+            visited[i] = true;
+            dfs(i,0, visited);
+        }
+
+        if(findAnswer) sb.append("1\n");
+        else sb.append("0\n");
+
+        bw.write(sb.toString());
         bw.flush();
         bw.close();
         br.close();
+    }
 
-    }//main()
+    private static void dfs(int idx, int depth, boolean[] visited) {
+        if(findAnswer) return;
 
-    public static void read() throws IOException{
-        String firstLine = br.readLine();
-        StringTokenizer st = new StringTokenizer(firstLine, " ");
-        int N = Integer.parseInt(st.nextToken());
-        int M = Integer.parseInt(st.nextToken());
-        A = new ArrayList[N];
-        arrive = false;
-        
-        visited = new boolean[N];
-        for(int i=0; i<N; i++){
-            A[i] = new ArrayList<Integer>();
-        }
-        for(int i=0; i<M; i++){
-            String readLines = br.readLine();
-            st = new StringTokenizer(readLines, " ");
-            int S = Integer.parseInt(st.nextToken());
-            int E = Integer.parseInt(st.nextToken());
-            A[S].add(E);
-            A[E].add(S);
-        }
-        for(int i=0; i<N; i++){
-            DFS(i,1); //Depth 1부터 시작
-            if(arrive) break;
-            
-        }
-        if(arrive) bw.write("1");
-        else bw.write("0");
-        
-    }//read()
-    
-    public static void DFS(int now,int depth){
-        if(depth ==5 || arrive){
-            arrive = true;
+        if(depth == 4){
+            //성공!
+            findAnswer = true;
             return;
         }
-        visited[now] = true;
-        for(int i:A[now]){
-            if(!visited[i]){
-                DFS(i,depth +1);
+
+        //현재 인덱스에서 다음 인덱스 순회
+        for(int x : listArr[idx]){
+            if(!visited[x]){
+                //현재 인덱스 방문처리.
+                visited[x] = true;
+                dfs(x,depth+1,visited);
+                //백트래킹
+                visited[x] = false;
             }
         }
-        visited[now] = false;
-    }
-}//Main
+
+    }//dfs
+
+}//Main Class
